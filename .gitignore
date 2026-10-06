@@ -1,0 +1,14 @@
+node_modules/
+dist/
+target/
+data/
+.env
+.env.*
+!.env.example
+*.log
+.idea/
+.vscode/
+.metadata/
+*.mv.db
+*.trace.db
+*.sql

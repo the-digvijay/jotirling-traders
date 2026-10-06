@@ -1,0 +1,146 @@
+[
+  {
+    "sku": "ANU-ARC-25",
+    "name": "ANU ARC Welding Electrodes",
+    "category": "WELDING",
+    "variant": "2.5 mm",
+    "unit": "box",
+    "price": 450
+  },
+  {
+    "sku": "ANU-BOND-315",
+    "name": "ANU BOND Welding Electrodes",
+    "category": "WELDING",
+    "variant": "3.15 mm",
+    "unit": "box",
+    "price": 520
+  },
+  {
+    "sku": "ANU-GP",
+    "name": "ANU GP Welding Electrodes",
+    "category": "WELDING",
+    "variant": "3.15 mm",
+    "unit": "box",
+    "price": 480
+  },
+  {
+    "sku": "NAVAKAR",
+    "name": "NAVAKAR Welding Electrodes",
+    "category": "WELDING",
+    "variant": "Demo pack",
+    "unit": "box",
+    "price": 400
+  },
+  {
+    "sku": "MIG-WIRE",
+    "name": "MIG Welding Wire",
+    "category": "WELDING",
+    "variant": "Demo spool",
+    "unit": "spool",
+    "price": 850
+  },
+  {
+    "sku": "WELD-GLOVES",
+    "name": "Welding Gloves",
+    "category": "WELDING_ACCESSORIES",
+    "variant": "Pair",
+    "unit": "pair",
+    "price": 180
+  },
+  {
+    "sku": "APEX-ULTIMA",
+    "name": "Asian Paints Apex Ultima",
+    "category": "PAINTS",
+    "variant": "White \u00b7 4 L",
+    "unit": "tin",
+    "price": 1800
+  },
+  {
+    "sku": "ROYALE",
+    "name": "Asian Paints Royale",
+    "category": "PAINTS",
+    "variant": "White \u00b7 1 L",
+    "unit": "tin",
+    "price": 650
+  },
+  {
+    "sku": "APCOLITE",
+    "name": "Asian Paints Apcolite",
+    "category": "PAINTS",
+    "variant": "White \u00b7 1 L",
+    "unit": "tin",
+    "price": 450
+  },
+  {
+    "sku": "TRACTOR",
+    "name": "Asian Paints Tractor Emulsion",
+    "category": "PAINTS",
+    "variant": "White \u00b7 4 L",
+    "unit": "tin",
+    "price": 600
+  },
+  {
+    "sku": "PVC-PIPE",
+    "name": "PVC Pipe",
+    "category": "PLUMBING",
+    "variant": "Demo size",
+    "unit": "piece",
+    "price": 150
+  },
+  {
+    "sku": "SWITCH",
+    "name": "Electrical Switch",
+    "category": "ELECTRICAL",
+    "variant": "Demo model",
+    "unit": "piece",
+    "price": 70
+  },
+  {
+    "sku": "BOLT",
+    "name": "Hardware Bolt Pack",
+    "category": "HARDWARE",
+    "variant": "Demo pack",
+    "unit": "pack",
+    "price": 120
+  },
+  {
+    "sku": "PLYWOOD",
+    "name": "Plywood Board",
+    "category": "PLYWOOD",
+    "variant": "Demo size",
+    "unit": "sheet",
+    "price": 1500
+  },
+  {
+    "sku": "CEMENT-ACC",
+    "name": "ACC Cement",
+    "category": "CEMENT",
+    "variant": "50 kg",
+    "unit": "bag",
+    "price": 380
+  },
+  {
+    "sku": "CEMENT-ULTRA",
+    "name": "UltraTech Cement",
+    "category": "CEMENT",
+    "variant": "50 kg",
+    "unit": "bag",
+    "price": 400
+  },
+  {
+    "sku": "WASHBASIN",
+    "name": "Wash Basin",
+    "category": "SANITARY",
+    "variant": "White",
+    "unit": "piece",
+    "price": 1800
+  },
+  {
+    "sku": "TOOLKIT",
+    "name": "Hand Tool Kit",
+    "category": "TOOLS",
+    "variant": "Demo set",
+    "unit": "set",
+    "price": 950
+  }
+]
