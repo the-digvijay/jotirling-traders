@@ -1,3 +1,8 @@
+import TripManifest from "./TripManifest";
+import SimplePayments,{AccountBalanceCards} from "./SimplePayments";
+import CustomerPayments,{PaymentRequests} from "./CustomerPayments";
+import OrderDeliveryPlan from "./OrderDeliveryPlan";
+import DeliveryRoutes,{RouteBanner} from "./DeliveryRoutes";
 import React, { useState, useEffect, useRef } from "react";
 import { api, money, today, errorText } from "./api";
 import OrderPayments, {PaymentLedger} from "./OrderPayments";
@@ -230,7 +235,7 @@ export default function App() {
               body: n.body,
               icon: "/icon-192.png",
               tag: "notice-" + n.id,
-              data: { url: "/?order=" + n.orderId },
+              data: { url: n.orderId ? "/?order=" + n.orderId : /Payment|जुन्या बाकी/.test(n.title) ? "/?page=Payments" : "/?page=Routes" },
             });
           } catch {}
         }
@@ -259,7 +264,11 @@ export default function App() {
           userRef.current = r.data;
           setUser(r.data);
           setPage(
-            new URLSearchParams(location.search).has("order")
+            new URLSearchParams(location.search).get("page") === "Payments"
+              ? "Payments"
+              : new URLSearchParams(location.search).get("page") === "Routes"
+                ? "Routes"
+                : new URLSearchParams(location.search).has("order")
               ? "Orders"
               : r.data.role === "ADMIN"
                 ? "Dashboard"
@@ -427,7 +436,11 @@ export default function App() {
       setAuthMode(null);
       setCredentials({ name: "", email: "", phone: "", password: "" });
       setPage(
-        new URLSearchParams(location.search).has("order")
+        new URLSearchParams(location.search).get("page") === "Payments"
+              ? "Payments"
+              : new URLSearchParams(location.search).get("page") === "Routes"
+                ? "Routes"
+                : new URLSearchParams(location.search).has("order")
           ? "Orders"
           : r.data.role === "ADMIN"
             ? "Dashboard"
@@ -670,9 +683,7 @@ export default function App() {
       ),
       ...(order.items.length > 5 ? [`आणखी ${order.items.length - 5} productsची माहिती appमध्ये पाहा.`] : []),
       `Order total: ${money(order.total)}`,
-      `Paid: ${money(order.payment?.paid)}`,
-      `Balance: ${money(order.payment?.balance)}`,
-      `Payment status: ${order.payment?.status || "NOT_DUE"}`,
+      "जमा आणि शिल्लक Payments पेजवर पाहा.",
       ...(admin && order.shopNotes ? [`Shop note: ${order.shopNotes.slice(0, 200)}`] : []),
       "पूर्ण माहिती appमधील Ordersमध्ये पाहा.",
     ].join("\n");
@@ -681,25 +692,19 @@ export default function App() {
   function nextStatuses(o) {
     switch (o.status) {
       case "PENDING":
-        return ["CONFIRMED", "REJECTED", "CANCELLED"];
+        return o.fulfilment === "DELIVERY" ? ["REJECTED", "CANCELLED"] : ["CONFIRMED", "REJECTED", "CANCELLED"];
       case "CONFIRMED":
-        return ["PREPARING", "READY", "CANCELLED"];
       case "PREPARING":
-        return ["READY", "CANCELLED"];
       case "READY":
-        return [
-          o.fulfilment === "PICKUP" ? "DELIVERED" : "DISPATCHED",
-          "CANCELLED",
-        ];
       case "DISPATCHED":
-        return ["DELIVERED"];
+        return ["DELIVERED", "CANCELLED"];
       default:
         return [];
     }
   }
   const menu = admin
-    ? ["Dashboard", "Products", "Orders", "Payments", "Purchases", "Notifications"]
-    : ["Catalogue", "Cart", "Orders", "Payments", "Notifications"];
+    ? ["Dashboard", "Products", "Orders", "Payments", "Purchases", "Routes", "Trip Load", "Notifications"]
+    : ["Catalogue", "Cart", "Orders", "Payments", "Routes", "Notifications"];
   const todayKey = orderDateKey(new Date().toISOString());
   const todayAdminOrders = admin
     ? orders.filter((o) => orderDateKey(o.createdAt) === todayKey)
@@ -1122,13 +1127,9 @@ export default function App() {
                 >
                   <option value="">All statuses</option>
                   <option value="IN_PROGRESS">In progress</option>
-                  {admin && <option value="OUTSTANDING">Outstanding / बाकी पैसे</option>}
                   {[
                     "PENDING",
                     "CONFIRMED",
-                    "PREPARING",
-                    "READY",
-                    "DISPATCHED",
                     "DELIVERED",
                     "REJECTED",
                     "CANCELLED",
@@ -1183,7 +1184,7 @@ export default function App() {
                       ))}
                     </div>
                     <div className="total">Total: {money(o.total)}</div>
-                    <OrderPayments order={o} admin={admin} accountId={user.id} busy={busy} run={run} refresh={refresh} />
+                    <OrderDeliveryPlan order={o} admin={admin} refresh={refresh} run={run} busy={busy} notes={orderNotes[o.id] || ""} />
                     {o.address && <p>Address: {o.address}</p>}
                     {o.customerNotes && (
                       <p>Customer notes: {o.customerNotes}</p>
@@ -1274,7 +1275,11 @@ export default function App() {
                 .length && <div className="empty panel">{orderSearch.trim() || statusFilter || orderFromDate || orderToDate ? "No matching orders. Search, dates किंवा status filter बदला." : "No orders yet."}</div>}
             </>
           )}
-          {page === "Payments" && user && <PaymentLedger orders={orders} admin={admin} onOpenOrders={()=>nav("Orders")} />}
+          {admin && page === "Payment Requests" && <><SimplePayments admin refresh={refresh} /><PaymentRequests refresh={refresh} /></>}
+          {admin && page === "Trip Load" && <TripManifest />}
+          {user && page === "Routes" && <DeliveryRoutes admin={admin} onOrder={()=>nav("Catalogue")} />}
+          {user && !admin && page === "Catalogue" && <RouteBanner onOpen={()=>nav("Routes")} />}
+          {page === "Payments" && user && <><SimplePayments admin={admin} refresh={refresh} />{admin && <PaymentRequests refresh={refresh} />}</>}
           {page === "Notifications" && (
             <section className="panel">
               <div className="sectiontitle">
@@ -1332,10 +1337,10 @@ export default function App() {
                             api.patch("/notifications/" + n.id + "/read"),
                           );
                         await refresh();
-                        nav("Orders");
+                        nav(n.orderId ? "Orders" : /Payment|जुन्या बाकी/.test(n.title) ? "Payments" : "Routes");
                       }}
                     >
-                      View orders →
+                      {n.orderId ? "View orders →" : /Payment|जुन्या बाकी/.test(n.title) ? "View payments →" : "View route →"}
                     </button>
                     {!n.read && (
                       <button
@@ -1371,8 +1376,6 @@ export default function App() {
               </section>
               <div className="stats">
                 {[
-                  ["Outstanding / बाकी", money(outstandingAdminCents / 100)],
-                  ["Orders with balance", outstandingAdminOrders.length],
                   ["Today’s orders", todayAdminOrders.length],
                   ["Today’s order sales", money(todayAdminSales)],
                   ["Pending orders", dashboard.pending || 0],
@@ -1403,6 +1406,7 @@ export default function App() {
                 ))}
               </div>
               <p className="muted">Today’s order sales: आज तयार झालेल्या व Delivered झालेल्या ordersची एकूण रक्कम (भारत वेळ). ही payment receivedची रक्कम नाही.</p>
+              <AccountBalanceCards onOpen={()=>nav("Payments")} />
               <section className="panel" id="low-stock-alerts">
                 <h3>Low stock alerts</h3>
                 <div className="tablewrap">

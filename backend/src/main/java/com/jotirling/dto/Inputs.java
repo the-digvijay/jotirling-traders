@@ -50,7 +50,7 @@ public class Inputs {
 
   public record StatusInput(
     @NotBlank @Pattern(
-      regexp = "CONFIRMED|PREPARING|READY|DISPATCHED|DELIVERED|REJECTED|CANCELLED"
+      regexp = "CONFIRMED|DELIVERED|REJECTED|CANCELLED"
     ) String status,
     @NotNull @Size(max = 500) String notes
   ) {}

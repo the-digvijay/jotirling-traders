@@ -117,7 +117,7 @@ public class PushGateway {
               "body",
               n.body,
               "url",
-              "/?order=" + (n.orderId == null ? "" : n.orderId),
+              n.orderId != null ? "/?order="+n.orderId : (n.title.contains("Payment") || n.title.contains("जुन्या बाकी") ? "/?page=Payments" : "/?page=Routes"),
               "tag",
               "notice-" + n.id
             )

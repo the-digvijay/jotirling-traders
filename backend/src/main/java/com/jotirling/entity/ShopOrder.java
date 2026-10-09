@@ -39,6 +39,10 @@ public class ShopOrder {
   @Column(nullable = false, precision = 15, scale = 2)
   public BigDecimal total;
 
+  @ManyToOne public DeliveryRoute deliveryRoute;
+  public LocalDate deliveryDate;
+  public LocalDate reminderSentFor;
+
   public Instant createdAt = Instant.now();
   public Instant updatedAt = Instant.now();
 }

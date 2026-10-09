@@ -99,7 +99,8 @@ public class ShopService {
     Instant createdAt,
     Instant updatedAt,
     List<LineView> items,
-    PaymentService.Summary payment
+    PaymentService.Summary payment,
+    Long deliveryRouteId, String deliveryRouteName, LocalDate deliveryDate
   ) {}
 
   public record PurchaseView(
@@ -193,7 +194,10 @@ public class ShopService {
           )
         )
         .toList(),
-      payments.summary(o)
+      payments.summary(o),
+      o.deliveryRoute==null?null:o.deliveryRoute.id,
+      o.deliveryRoute==null?null:o.deliveryRoute.name,
+      o.deliveryDate
     );
   }
 
@@ -367,21 +371,14 @@ public class ShopService {
         case "PENDING" -> Set.of("CONFIRMED", "REJECTED", "CANCELLED").contains(
           next
         );
-        case "CONFIRMED" -> Set.of("PREPARING", "READY", "CANCELLED").contains(
-          next
-        );
-        case "PREPARING" -> Set.of("READY", "CANCELLED").contains(next);
-        case "READY" -> Set.of(
-          o.fulfilment.equals("PICKUP") ? "DELIVERED" : "DISPATCHED",
-          "CANCELLED"
-        ).contains(next);
-        case "DISPATCHED" -> next.equals("DELIVERED");
+        case "CONFIRMED", "PREPARING", "READY", "DISPATCHED" -> Set.of("DELIVERED", "CANCELLED").contains(next);
         default -> false;
       };
     if (!allowed) throw bad(
       "Invalid status transition: " + o.status + " → " + next
     );
     if (next.equals("CANCELLED") && payments.summary(o).paid().signum() > 0) throw bad("A paid order cannot be cancelled. Refund handling is not supported; contact the shop.");
+    if (next.equals("CONFIRMED") && "DELIVERY".equals(o.fulfilment) && (o.deliveryRoute==null || o.deliveryDate==null)) throw bad("Save delivery route and date before confirming this order");
     var rows = lines.findByShopOrderIdOrderByProductIdAsc(o.id);
     boolean hadReservation = Set.of(
       "CONFIRMED",
